@@ -1,2 +1,15 @@
 bin_PROGRAMS = console-watcher
-console_watcher_SOURCES = main.cpp ConsoleWatcher.cpp ConsoleWatcher.h
+console_watcher_SOURCES = \
+    main.cpp \
+    ConsoleWatcher.cpp \
+    ConsoleWatcher.h \
+    ConsoleColor.cpp \
+    ConsoleColor.h \
+    ObservedString.h \
+    Logger.cpp \
+    Logger.h \
+	MouseObserver.cpp \
+	MouseObserver.h \
+	IObserver.h 
+	
+	
