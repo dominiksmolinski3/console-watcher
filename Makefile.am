@@ -13,4 +13,5 @@ console_watcher_SOURCES = \
     IObserver.h
 
 # Linker flags to include X11 library
-console_watcher_LDADD = $(X_LIBS)
+console_watcher_LDADD = $(X_LIBS) -lX11
+
