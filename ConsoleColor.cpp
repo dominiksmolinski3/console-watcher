@@ -12,10 +12,6 @@ namespace ConsoleColor {
         }
     }
 
-    void resetColor() {
-        setColor(7); // 7 is the default console color
-    }
-
     void clearConsole() {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         COORD coordScreen = { 0, 0 };
