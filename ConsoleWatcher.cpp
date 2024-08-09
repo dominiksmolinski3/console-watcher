@@ -3,7 +3,53 @@
 #include <thread>
 #include <chrono>
 #include "ConsoleColor.h"
-#include <conio.h> // For _kbhit() and _getch()
+
+// Cross-platform support for _kbhit() and _getch()
+#ifdef _WIN32
+#include <conio.h>  // Windows-specific includes
+#else
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+// Implement getch() and kbhit() for Unix-like systems
+int getch(void) {
+    struct termios oldattr, newattr;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldattr);
+    newattr = oldattr;
+    newattr.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+    return ch;
+}
+
+int kbhit(void) {
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+    ch = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILINO, F_SETFL, oldf);
+
+    if (ch != EOF) {
+        ungetc(ch, stdin);
+        return 1;
+    }
+
+    return 0;
+}
+#endif
 
 ConsoleWatcher::ConsoleWatcher(std::shared_ptr<Logger> logger, ObservedString& observedString)
     : logger_(logger), observedString_(observedString), oldCoutBuffer_(std::cout.rdbuf()), buffer_() {
@@ -21,10 +67,10 @@ void ConsoleWatcher::printMessage() {
 
 void ConsoleWatcher::waitForExit() {
     std::cout << "Press any key to exit..." << std::endl;
-    while (!_kbhit()) { // Wait for key press
+    while (!kbhit()) { // Use cross-platform kbhit()
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    _getch(); // Consume the key press
+    getch(); // Use cross-platform getch() to consume the key press
 }
 
 void ConsoleWatcher::run() {
@@ -80,7 +126,3 @@ void ConsoleWatcher::HandleEvent(const ObservedString& ref) {
     // Restore the original std::cout buffer
     std::cout.rdbuf(oldCoutBuffer_);
 }
-
-
-
-
