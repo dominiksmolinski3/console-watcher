@@ -13,11 +13,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: configure
+
+    # Install necessary tools for autoconf
+    - name: Install dependencies
+      run: sudo apt-get install -y autoconf automake libtool
+
+    # Generate configure script
+    - name: Generate configure script
+      run: autoreconf -i
+
+    # Run configure script
+    - name: Configure
       run: ./configure
-    - name: make
+
+    # Build the project
+    - name: Build
       run: make
-    - name: make check
+
+    # Run tests
+    - name: Run Tests
       run: make check
-    - name: make distcheck
+
+    # Run distcheck (if necessary)
+    - name: Distcheck
       run: make distcheck
