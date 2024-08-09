@@ -1,4 +1,5 @@
 bin_PROGRAMS = console-watcher
+
 console_watcher_SOURCES = \
     main.cpp \
     ConsoleWatcher.cpp \
@@ -8,8 +9,9 @@ console_watcher_SOURCES = \
     ObservedString.h \
     Logger.cpp \
     Logger.h \
-	MouseObserver.cpp \
-	MouseObserver.h \
-	IObserver.h 
-	
-	
+    MouseObserver.cpp \
+    MouseObserver.h \
+    IObserver.h
+
+# Linker flags to include X11 library
+console_watcher_LDADD = $(X_LIBS)
