@@ -1,10 +1,17 @@
-#ifndef CONSOLECOLOR_H
-#define CONSOLECOLOR_H
-#include <string>
+#ifndef CONSOLE_COLOR_H
+#define CONSOLE_COLOR_H
 
-namespace ConsoleColor {
-    void setColor(int color);
-    void clearConsole();
-}
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <iostream>
+#endif
 
-#endif // CONSOLECOLOR_H
+class ConsoleColor {
+public:
+    static void setColor(int color);
+    static void resetColor();
+    static void clearConsole();
+};
+
+#endif // CONSOLE_COLOR_H
