@@ -40,7 +40,7 @@ int kbhit(void) {
     ch = getchar();
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    fcntl(STDIN_FILINO, F_SETFL, oldf);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
 
     if (ch != EOF) {
         ungetc(ch, stdin);
