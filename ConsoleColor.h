@@ -9,9 +9,8 @@
 
 class ConsoleColor {
 public:
-    static void setColor(int color);
-    static void resetColor();
     static void clearConsole();
+    static void readConsoleOutput(int color);
 };
 
 #endif // CONSOLE_COLOR_H

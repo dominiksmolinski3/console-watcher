@@ -1,14 +1,55 @@
 #include "ConsoleColor.h"
+#include <iostream>
+#include <vector>
 
 #ifdef _WIN32
-void ConsoleColor::setColor(int color) {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
-}
+#include <windows.h>
 
-void ConsoleColor::resetColor() {
+void ConsoleColor::readConsoleOutput(int color) {
+    // handle to the console output buffer
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, 7); // Reset to default color
+    if (hConsole == INVALID_HANDLE_VALUE) {
+        std::cerr << "Error getting console handle" << std::endl;
+        return;
+    }
+
+    // size of the buffer to read
+    const int width = 80;
+    const int height = 20;
+    COORD bufferSize = {width, height};
+
+    // rectangle to read from (top-left corner)
+    SMALL_RECT readRegion = {0, 0, width - 1, height - 1};
+
+    // buffer to hold the characters and attributes
+    std::vector<CHAR_INFO> buffer(width * height);
+
+    // buffer coordinates
+    COORD bufferCoord = {0, 0};
+
+    // console output into the buffer
+    BOOL success = ReadConsoleOutput(
+        hConsole,
+        buffer.data(),
+        bufferSize,
+        bufferCoord,
+        &readRegion
+    );
+
+    if (!success) {
+        std::cerr << "Error reading console output" << std::endl;
+        return;
+    }
+    ConsoleColor::clearConsole();
+    SetConsoleTextAttribute(hConsole, color);
+    // display contents of the buffer
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            CHAR_INFO charInfo = buffer[x + y * width];
+            std::wcout << charInfo.Char.UnicodeChar;
+        }
+        std::wcout << std::endl;
+    }
 }
 
 void ConsoleColor::clearConsole() {
@@ -49,10 +90,6 @@ void ConsoleColor::setColor(int color) {
             std::cout << "\033[0m";
             break;
     }
-}
-
-void ConsoleColor::resetColor() {
-    std::cout << "\033[0m";  // Reset color using ANSI codes
 }
 
 void ConsoleColor::clearConsole() {
